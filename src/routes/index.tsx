@@ -6,7 +6,6 @@ import { Marquee } from "@/components/fx/marquee";
 import { Magnetic, Reveal, SplitWords } from "@/components/fx/motion-primitives";
 import { clubs } from "@/data/clubs";
 import { itsa } from "@/data/itsa";
-import eventsData from "@/data/events.json";
 
 const title = "ITSA — Information Technology Students' Association, PCCoE Pune";
 const description =
@@ -31,7 +30,6 @@ function Index() {
   const shift = useTransform(scrollYProgress, [0, 1], ["0%", reduced ? "0%" : "-8%"]);
   const fade = useTransform(scrollYProgress, [0, 0.85], [1, reduced ? 1 : 0.25]);
 
-  const latest = eventsData.slice(0, 4);
 
   return (
     <>
@@ -196,36 +194,11 @@ function Index() {
         </div>
       </section>
 
-      {/* LATEST — horizontal filmstrip */}
-      <section className="border-t border-foreground/20 px-5 py-24 sm:px-8">
+      {/* VISION SLAB */}
+      <section className="border-y border-foreground/20 bg-foreground px-5 py-24 text-background sm:px-8">
         <div className="mx-auto max-w-[1600px]">
-          <p className="label-mono">03 — Recent activity</p>
-          <h2 className="mt-4 display-md">Latest from the department floor.</h2>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            {latest.map((e, i) => (
-              <Reveal key={e.id} delay={i * 0.07}>
-                <Link to="/events" className="group block h-full">
-                  <article className="ink-card h-full overflow-hidden hover:-translate-y-1 hover:offset-shadow">
-                    {e.images?.[0] ? (
-                      <div className="aspect-[4/3] overflow-hidden bg-surface-2">
-                        <img
-                          src={e.images[0]}
-                          alt={e.name}
-                          loading="lazy"
-                          className="size-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
-                        />
-                      </div>
-                    ) : null}
-                    <div className="p-5">
-                      <p className="label-mono text-[9px]">{e.date}</p>
-                      <p className="mt-3 font-display text-lg font-bold leading-tight">{e.name}</p>
-                    </div>
-                  </article>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-70">Vision</p>
+          <SplitWords text={itsa.vision} className="mt-6 max-w-[24ch] display-md" />
         </div>
       </section>
     </>
