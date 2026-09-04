@@ -5,13 +5,8 @@ import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 const links = [
-  { to: "/", label: "Index" },
-  { to: "/about", label: "About" },
-  { to: "/clubs", label: "Clubs" },
-  { to: "/teams", label: "Teams" },
+  { to: "/", label: "Home" },
   { to: "/events", label: "Events" },
-  { to: "/achievements", label: "Wins" },
-  { to: "/contact", label: "Contact" },
 ] as const;
 
 export function SiteNav() {

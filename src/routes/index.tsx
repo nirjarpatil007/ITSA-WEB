@@ -76,14 +76,7 @@ function Index() {
                       <span className="transition-transform group-hover:translate-x-1">→</span>
                     </Link>
                   </Magnetic>
-                  <Magnetic>
-                    <Link
-                      to="/teams"
-                      className="inline-flex items-center gap-3 border border-foreground/30 px-6 py-4 font-mono text-[11px] uppercase tracking-[0.2em] transition-colors hover:border-foreground"
-                    >
-                      Meet the teams
-                    </Link>
-                  </Magnetic>
+
                 </div>
 
                 <div className="mt-10 border-l-[6px] border-primary pl-4">
@@ -139,12 +132,7 @@ function Index() {
                 </Reveal>
               ))}
             </ul>
-            <Link
-              to="/about"
-              className="mt-8 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-primary"
-            >
-              Read the full story →
-            </Link>
+
           </div>
         </div>
       </section>
@@ -157,12 +145,7 @@ function Index() {
               <p className="label-mono">02 — The ecosystem</p>
               <h2 className="mt-4 display-md">Six wings, one association.</h2>
             </div>
-            <Link
-              to="/clubs"
-              className="font-mono text-[11px] uppercase tracking-[0.2em] text-primary"
-            >
-              Enter the ecosystem →
-            </Link>
+
           </div>
 
           <div className="mt-12 grid auto-rows-[minmax(180px,auto)] gap-4 md:grid-cols-3">

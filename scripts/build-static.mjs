@@ -4,12 +4,7 @@ import path from "node:path";
 
 const routes = [
   "/",
-  "/about",
-  "/clubs",
-  "/teams",
   "/events",
-  "/achievements",
-  "/contact",
 ];
 
 async function run() {
@@ -73,8 +68,15 @@ async function run() {
   await fs.writeFile(path.join(publicDir, ".nojekyll"), "", "utf-8");
 
   console.log("\n=== Step 3: Finished! Static site generated in .output/public ===");
-  server.kill();
-  process.exit(0);
+  if (process.platform === "win32") {
+    try {
+      execSync(`taskkill /pid ${server.pid} /T /F`, { stdio: "ignore" });
+    } catch {}
+    process.exit(0);
+  } else {
+    server.kill("SIGTERM");
+    process.exit(0);
+  }
 }
 
 run().catch((err) => {

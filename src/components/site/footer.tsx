@@ -5,19 +5,10 @@ import { itsa } from "@/data/itsa";
 
 const columns = [
   {
-    title: "Navigate",
+    title: "Pages",
     links: [
-      { to: "/about", label: "About" },
-      { to: "/clubs", label: "Clubs" },
-      { to: "/teams", label: "Teams" },
-    ],
-  },
-  {
-    title: "Activity",
-    links: [
+      { to: "/", label: "Home" },
       { to: "/events", label: "Events" },
-      { to: "/achievements", label: "Achievements" },
-      { to: "/contact", label: "Contact" },
     ],
   },
 ] as const;
@@ -35,7 +26,7 @@ export function SiteFooter() {
         ]}
       />
 
-      <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <p className="display-md">ITSA</p>
           <p className="mt-4 max-w-sm text-sm text-muted-foreground">{itsa.tagline}</p>
