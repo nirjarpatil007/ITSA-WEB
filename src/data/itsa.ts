@@ -54,8 +54,8 @@ export const itsa = {
     detail: "Coming Soon",
   },
   contact: {
-    email: "itsadept@college.edu",
-    phone: "+91 9834330401",
+    email: "nirjar.patil25@pccoepune.org",
+    phone: "+91 9730726966",
     address: "Information Technology Department, PCCoE, Pune",
     social: PLACEHOLDER,
   },
