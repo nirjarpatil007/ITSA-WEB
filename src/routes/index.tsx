@@ -122,79 +122,52 @@ function Index() {
             <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted-foreground">
               {itsa.intro}
             </p>
-            <div className="mt-10 border border-foreground/20 bg-surface/50">
-              <div className="flex items-center justify-between border-b border-foreground/20 px-4 py-2 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-                <span>Mission Directives</span>
-                <span>PCCoE IT Department</span>
-              </div>
-              <ul className="divide-y divide-foreground/15">
-                {itsa.mission.slice(0, 3).map((m, i) => (
-                  <Reveal key={m} delay={i * 0.06}>
-                    <li className="flex items-baseline gap-4 px-4 py-3.5 transition-colors hover:bg-foreground/[0.03]">
-                      <span className="shrink-0 font-mono text-[10px] font-bold text-foreground">
-                        M{i + 1}
-                      </span>
-                      <span className="text-sm leading-relaxed text-muted-foreground">{m}</span>
-                    </li>
-                  </Reveal>
-                ))}
-              </ul>
-            </div>
+            <ul className="mt-10 divide-y divide-border border-y border-border">
+              {itsa.mission.slice(0, 3).map((m, i) => (
+                <Reveal key={m} delay={i * 0.06}>
+                  <li className="flex items-baseline gap-5 py-4">
+                    <span className="font-mono text-[10px] text-primary">M{i + 1}</span>
+                    <span className="text-sm text-muted-foreground">{m}</span>
+                  </li>
+                </Reveal>
+              ))}
+            </ul>
+
           </div>
         </div>
       </section>
 
-      {/* CLUB ECOSYSTEM MATRIX */}
-      <section className="border-t border-foreground/20 bg-surface px-5 py-14 sm:px-8">
+      {/* CLUB BENTO */}
+      <section className="border-t border-foreground/20 bg-surface px-5 py-24 sm:px-8">
         <div className="mx-auto max-w-[1600px]">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="label-mono">02 — The ecosystem</p>
-              <h2 className="mt-3 display-md">Six wings, one association.</h2>
+              <h2 className="mt-4 display-md">Six wings, one association.</h2>
             </div>
+
           </div>
 
-          <div className="mt-8 grid gap-3 sm:gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid auto-rows-[minmax(180px,auto)] gap-4 md:grid-cols-3">
             {clubs.map((c, i) => (
-              <Reveal key={c.id} delay={i * 0.04}>
-                <article
-                  className="ink-card group relative flex h-full flex-col justify-between border border-foreground/20 bg-card/70 p-4 sm:p-5 transition-all duration-300 hover:-translate-y-1 hover:border-foreground hover:bg-card hover:offset-shadow"
-                >
-                  {/* Subtle corner marker */}
-                  <span
-                    aria-hidden="true"
-                    className="absolute right-3 top-3 select-none font-mono text-[10px] text-foreground/20 transition-colors group-hover:text-foreground/70"
-                  >
-                    +
-                  </span>
-
+              <Reveal
+                key={c.id}
+                delay={i * 0.05}
+                className={i === 0 ? "md:col-span-2 md:row-span-2" : ""}
+              >
+                <article className="ink-card group flex h-full flex-col justify-between p-7 hover:-translate-y-1 hover:offset-shadow-primary">
                   <div>
-                    {/* Top code badge & index */}
-                    <div className="flex items-center justify-between border-b border-foreground/10 pb-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <span className="size-1.5 rounded-full bg-foreground/60 transition-colors group-hover:bg-foreground" />
-                        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-foreground/80">
-                          {c.code}
-                        </span>
-                      </div>
-                      <span className="font-mono text-[10px] text-foreground/30 transition-colors group-hover:text-foreground/60">
-                        0{i + 1}
-                      </span>
-                    </div>
-
-                    {/* Title & Domain */}
-                    <div className="mt-3.5">
-                      <h3 className="font-display text-2xl font-extrabold tracking-tight text-foreground sm:text-[1.65rem]">
-                        {c.short}
-                      </h3>
-                      <p className="mt-0.5 font-mono text-[11px] text-muted-foreground line-clamp-1">
-                        {c.domain}
-                      </p>
-                    </div>
+                    <p className="font-mono text-[10px] tracking-[0.2em] text-primary">{c.code}</p>
+                    <p
+                      className={`mt-4 font-display font-extrabold tracking-tight ${i === 0 ? "text-5xl sm:text-7xl" : "text-3xl"}`}
+                    >
+                      {c.short}
+                    </p>
+                    <p className="mt-2 text-sm text-muted-foreground">{c.domain}</p>
                   </div>
-
-                  {/* Description */}
-                  <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-2 sm:line-clamp-3">
+                  <p
+                    className={`mt-6 text-sm text-muted-foreground ${i === 0 ? "" : "line-clamp-3"}`}
+                  >
                     {c.description}
                   </p>
                 </article>
