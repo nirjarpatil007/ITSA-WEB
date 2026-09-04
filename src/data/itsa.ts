@@ -49,9 +49,9 @@ export const itsa = {
     { name: "Mrs. Shraddha Tawade", role: "ITSA Coordinator" },
   ],
   highlight: {
-    name: "Innoveda 2026",
-    date: "18th March 2026",
-    detail: "Young Researcher Conference 2025-26",
+    name: "Praxis 2026",
+    date: "October 2026",
+    detail: "Coming Soon",
   },
   contact: {
     email: "itsadept@college.edu",
