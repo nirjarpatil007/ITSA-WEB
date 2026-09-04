@@ -3,7 +3,7 @@ import { motion, useReducedMotion, useScroll, useTransform } from "motion/react"
 import { useRef } from "react";
 
 import { Marquee } from "@/components/fx/marquee";
-import { Counter, Magnetic, Reveal, SplitWords } from "@/components/fx/motion-primitives";
+import { Magnetic, Reveal, SplitWords } from "@/components/fx/motion-primitives";
 import { clubs } from "@/data/clubs";
 import { itsa } from "@/data/itsa";
 import eventsData from "@/data/events.json";
@@ -112,22 +112,6 @@ function Index() {
             ]}
           />
         </motion.div>
-      </section>
-
-      {/* STATS — big numeral band */}
-      <section className="border-b border-foreground/20">
-        <div className="mx-auto grid max-w-[1600px] grid-cols-2 gap-px bg-border sm:grid-cols-4">
-          {itsa.stats.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.06} className="group bg-background px-6 py-12">
-              <Counter
-                value={s.value}
-                suffix={s.suffix}
-                className="block font-display text-6xl font-extrabold tracking-tighter text-primary"
-              />
-              <p className="label-mono mt-4">{s.label}</p>
-            </Reveal>
-          ))}
-        </div>
       </section>
 
       {/* MANIFESTO */}
