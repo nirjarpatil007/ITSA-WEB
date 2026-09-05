@@ -38,18 +38,6 @@ function getEventCategory(name: string, overview: string): string {
   return "career";
 }
 
-/**
- * Optimizes Cloudinary URLs to serve compressed WebP/AVIF images scaled to target width.
- * Reduces file size from ~5MB down to ~40KB for instant loading.
- */
-function getOptimizedImageUrl(url: string, width = 800): string {
-  if (!url) return "";
-  if (url.includes("res.cloudinary.com") && url.includes("/image/upload/")) {
-    return url.replace("/image/upload/", `/image/upload/f_auto,q_auto:eco,w_${width}/`);
-  }
-  return url;
-}
-
 const title = "Events & Initiatives — ITSA PCCoE Pune";
 const description =
   "Every ITSA event at PCCoE Pune: BRUTEFORGE, AI expert sessions, higher-studies guidance, NSS drives and more.";
@@ -86,8 +74,9 @@ function Events() {
 
   // Lightbox modal state for expandable images
   const [activeLightbox, setActiveLightbox] = useState<ActiveLightbox | null>(null);
+  const [imageLoading, setImageLoading] = useState(false);
 
-  // Keyboard navigation & preloading for Lightbox
+  // Keyboard navigation for Lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!activeLightbox) return;
@@ -118,19 +107,6 @@ function Events() {
     if (activeLightbox) {
       window.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
-
-      // Preload next and previous images in background for instantaneous transitions
-      const { images, currentIndex } = activeLightbox;
-      if (images.length > 1) {
-        const nextIdx = (currentIndex + 1) % images.length;
-        const prevIdx = (currentIndex - 1 + images.length) % images.length;
-        [images[nextIdx], images[prevIdx]].forEach((src) => {
-          if (src) {
-            const img = new Image();
-            img.src = getOptimizedImageUrl(src, 1200);
-          }
-        });
-      }
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
@@ -392,22 +368,23 @@ function Events() {
                               }`}
                             >
                               <figure
-                                onClick={() =>
-                                  e.images && e.images.length > 0 &&
-                                  setActiveLightbox({
-                                    eventName: e.name,
-                                    images: e.images,
-                                    currentIndex: 0,
-                                  })
-                                }
+                                onClick={() => {
+                                  if (e.images && e.images.length > 0) {
+                                    setImageLoading(true);
+                                    setActiveLightbox({
+                                      eventName: e.name,
+                                      images: e.images,
+                                      currentIndex: 0,
+                                    });
+                                  }
+                                }}
                                 className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
                               >
                                 {e.images?.[0] ? (
                                   <img
-                                    src={getOptimizedImageUrl(e.images[0], 900)}
+                                    src={e.images[0]}
                                     alt={e.name}
                                     loading={i < 2 ? "eager" : "lazy"}
-                                    decoding="async"
                                     className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
@@ -419,11 +396,11 @@ function Events() {
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
-                                    <span>Expand</span>
+                                    <span>Click to expand</span>
                                   </div>
                                 )}
                               </figure>
@@ -452,20 +429,20 @@ function Events() {
                                         <button
                                           key={`${e.id}-${si}`}
                                           type="button"
-                                          onClick={() =>
+                                          onClick={() => {
+                                            setImageLoading(true);
                                             setActiveLightbox({
                                               eventName: e.name,
                                               images: e.images!,
                                               currentIndex: si,
-                                            })
-                                          }
+                                            });
+                                          }}
                                           className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2"
                                         >
                                           <img
-                                            src={getOptimizedImageUrl(src, 200)}
+                                            src={src}
                                             alt=""
                                             loading="lazy"
-                                            decoding="async"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
                                           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
@@ -549,22 +526,23 @@ function Events() {
                               }`}
                             >
                               <figure
-                                onClick={() =>
-                                  e.images && e.images.length > 0 &&
-                                  setActiveLightbox({
-                                    eventName: e.name,
-                                    images: e.images,
-                                    currentIndex: 0,
-                                  })
-                                }
+                                onClick={() => {
+                                  if (e.images && e.images.length > 0) {
+                                    setImageLoading(true);
+                                    setActiveLightbox({
+                                      eventName: e.name,
+                                      images: e.images,
+                                      currentIndex: 0,
+                                    });
+                                  }
+                                }}
                                 className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
                               >
                                 {e.images?.[0] ? (
                                   <img
-                                    src={getOptimizedImageUrl(e.images[0], 900)}
+                                    src={e.images[0]}
                                     alt={e.name}
                                     loading={i < 2 ? "eager" : "lazy"}
-                                    decoding="async"
                                     className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
@@ -576,11 +554,11 @@ function Events() {
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
-                                    <span>Expand</span>
+                                    <span>Click to expand</span>
                                   </div>
                                 )}
                               </figure>
@@ -609,20 +587,20 @@ function Events() {
                                         <button
                                           key={`${e.id}-${si}`}
                                           type="button"
-                                          onClick={() =>
+                                          onClick={() => {
+                                            setImageLoading(true);
                                             setActiveLightbox({
                                               eventName: e.name,
                                               images: e.images!,
                                               currentIndex: si,
-                                            })
-                                          }
+                                            });
+                                          }}
                                           className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2"
                                         >
                                           <img
-                                            src={getOptimizedImageUrl(src, 200)}
+                                            src={src}
                                             alt=""
                                             loading="lazy"
-                                            decoding="async"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
                                           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
@@ -660,18 +638,18 @@ function Events() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={() => setActiveLightbox(null)}
-            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-8 backdrop-blur-xl cursor-zoom-out select-none"
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-xl cursor-zoom-out select-none"
           >
             {/* Top Toolbar */}
-            <div className="absolute top-4 inset-x-4 sm:inset-x-8 flex items-center justify-between z-30 pointer-events-none">
-              <div className="flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-1.5 backdrop-blur-md border border-white/15 pointer-events-auto">
+            <div className="w-full max-w-5xl flex items-center justify-between z-30 mb-3 px-2">
+              <div className="flex items-center gap-3 rounded-full bg-neutral-900/90 px-4 py-2 backdrop-blur-md border border-white/20 shadow-lg">
                 <span className="size-2 rounded-full bg-primary animate-pulse" />
-                <span className="font-mono text-xs font-semibold text-white tracking-wide">
+                <span className="font-mono text-xs font-bold text-white tracking-wide">
                   {activeLightbox.eventName}
                 </span>
                 <span className="text-white/40">|</span>
-                <span className="font-mono text-xs text-white/70">
-                  {activeLightbox.currentIndex + 1} / {activeLightbox.images.length}
+                <span className="font-mono text-xs text-white/80">
+                  Photo {activeLightbox.currentIndex + 1} of {activeLightbox.images.length}
                 </span>
               </div>
 
@@ -679,102 +657,112 @@ function Events() {
               <button
                 type="button"
                 onClick={() => setActiveLightbox(null)}
-                className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-white/15 text-white transition-all hover:bg-white/30 hover:scale-105 focus:outline-none shadow-lg"
+                className="flex size-10 items-center justify-center rounded-full bg-neutral-900/90 border border-white/20 text-white transition-all hover:bg-neutral-800 hover:scale-105 focus:outline-none shadow-lg cursor-pointer"
                 aria-label="Close image preview"
               >
                 <span className="font-mono text-2xl font-light leading-none">×</span>
               </button>
             </div>
 
-            {/* Centered Main Image Presentation Container */}
+            {/* Centered Main Image Presentation Box */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative flex items-center justify-center max-h-[75vh] max-w-[92vw] cursor-default my-auto min-h-[300px] min-w-[300px]"
+              className="relative flex items-center justify-center max-h-[72vh] max-w-5xl w-full rounded-2xl bg-neutral-950/80 border border-white/15 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
             >
-              <AnimatePresence mode="wait">
-                <motion.img
-                  key={activeLightbox.images[activeLightbox.currentIndex]}
-                  src={getOptimizedImageUrl(activeLightbox.images[activeLightbox.currentIndex], 1400)}
-                  alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="max-h-[72vh] max-w-[90vw] object-contain rounded-lg border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
-                />
-              </AnimatePresence>
+              {/* Spinner while loading */}
+              {imageLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/70">
+                  <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                  <span className="font-mono text-xs text-neutral-300">Loading photo...</span>
+                </div>
+              )}
+
+              <img
+                key={activeLightbox.images[activeLightbox.currentIndex]}
+                src={activeLightbox.images[activeLightbox.currentIndex]}
+                alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
+                onLoad={() => setImageLoading(false)}
+                onError={() => setImageLoading(false)}
+                className={`max-h-[68vh] max-w-full object-contain rounded-lg transition-opacity duration-200 ${
+                  imageLoading ? "opacity-0" : "opacity-100"
+                }`}
+              />
+
+              {/* Left / Right Navigation Arrows */}
+              {activeLightbox.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setImageLoading(true);
+                      setActiveLightbox((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              currentIndex:
+                                (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+                            }
+                          : null
+                      );
+                    }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex size-11 items-center justify-center rounded-full bg-black/70 border border-white/20 text-white text-2xl font-light transition-all hover:bg-black/90 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
+                    aria-label="Previous photo"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setImageLoading(true);
+                      setActiveLightbox((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              currentIndex:
+                                (prev.currentIndex + 1) % prev.images.length,
+                            }
+                          : null
+                      );
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex size-11 items-center justify-center rounded-full bg-black/70 border border-white/20 text-white text-2xl font-light transition-all hover:bg-black/90 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
+                    aria-label="Next photo"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
             </div>
 
-            {/* Navigation Arrows for multi-photo sets */}
+            {/* Bottom Thumbnail Dock */}
             {activeLightbox.images.length > 1 && (
-              <>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveLightbox((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            currentIndex:
-                              (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
-                          }
-                        : null
-                    );
-                  }}
-                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-white/15 text-white text-2xl font-light transition-all hover:bg-white/30 hover:scale-110 focus:outline-none shadow-lg"
-                  aria-label="Previous photo"
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveLightbox((prev) =>
-                      prev
-                        ? {
-                            ...prev,
-                            currentIndex:
-                              (prev.currentIndex + 1) % prev.images.length,
-                          }
-                        : null
-                    );
-                  }}
-                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-white/15 text-white text-2xl font-light transition-all hover:bg-white/30 hover:scale-110 focus:outline-none shadow-lg"
-                  aria-label="Next photo"
-                >
-                  ›
-                </button>
-
-                {/* Bottom Thumbnail Strip */}
-                <div
-                  onClick={(e) => e.stopPropagation()}
-                  className="absolute bottom-4 z-30 flex gap-2.5 overflow-x-auto max-w-[92vw] rounded-xl bg-black/80 p-2 backdrop-blur-md border border-white/15 shadow-xl"
-                >
-                  {activeLightbox.images.map((imgUrl, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() =>
-                        setActiveLightbox((prev) => (prev ? { ...prev, currentIndex: idx } : null))
+              <div
+                onClick={(e) => e.stopPropagation()}
+                className="mt-3 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/15 shadow-xl"
+              >
+                {activeLightbox.images.map((imgUrl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      if (idx !== activeLightbox.currentIndex) {
+                        setImageLoading(true);
+                        setActiveLightbox((prev) =>
+                          prev ? { ...prev, currentIndex: idx } : null
+                        );
                       }
-                      className={`size-12 shrink-0 overflow-hidden rounded-md transition-all ${
-                        idx === activeLightbox.currentIndex
-                          ? "ring-2 ring-primary scale-105 opacity-100"
-                          : "opacity-45 hover:opacity-80"
-                      }`}
-                    >
-                      <img
-                        src={getOptimizedImageUrl(imgUrl, 160)}
-                        alt=""
-                        className="size-full object-cover"
-                        loading="lazy"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </>
+                    }}
+                    className={`size-14 shrink-0 overflow-hidden rounded-lg transition-all border cursor-pointer ${
+                      idx === activeLightbox.currentIndex
+                        ? "border-primary ring-2 ring-primary/50 scale-105 opacity-100"
+                        : "border-white/10 opacity-50 hover:opacity-85"
+                    }`}
+                  >
+                    <img src={imgUrl} alt="" className="size-full object-cover" />
+                  </button>
+                ))}
+              </div>
             )}
           </motion.div>
         )}
@@ -782,6 +770,7 @@ function Events() {
     </>
   );
 }
+
 
 
 
