@@ -667,10 +667,10 @@ function Events() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="fixed left-[50%] top-[50%] z-[100] translate-x-[-50%] translate-y-[-50%] flex flex-col items-center justify-between w-full max-w-5xl max-h-[95vh] p-4 pointer-events-none select-none"
+              className="fixed left-[50%] top-[50%] z-[100] translate-x-[-50%] translate-y-[-50%] flex flex-col items-center justify-between w-full max-w-5xl max-h-[95vh] p-4"
             >
               {/* Top Toolbar */}
-              <div className="w-full flex items-center justify-between z-10 mb-3 px-1 pointer-events-auto">
+              <div className="w-full flex items-center justify-between z-10 mb-3 px-1">
                 <div className="flex items-center gap-3 rounded-full bg-neutral-900/95 px-4 py-2 border border-white/20 shadow-2xl">
                   <span className="size-2 rounded-full bg-primary animate-pulse" />
                   <span className="font-mono text-xs font-bold text-white tracking-wide">
@@ -694,12 +694,13 @@ function Events() {
               </div>
 
               {/* Centered Expanded Image - Pure Vibrant Colors with zero dimming/opacity */}
-              <div className="relative flex items-center justify-center max-h-[75vh] w-full my-auto pointer-events-auto">
+              <div className="relative flex items-center justify-center max-h-[85vh] w-full my-auto">
                 <img
                   key={activeLightbox.images[activeLightbox.currentIndex]}
                   src={activeLightbox.images[activeLightbox.currentIndex]}
                   alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                  className="max-h-[74vh] max-w-full object-contain rounded-xl shadow-2xl block"
+                  className="w-full max-w-5xl max-h-[85vh] object-contain rounded-xl shadow-2xl block opacity-100 brightness-100"
+                  style={{ filter: 'brightness(100%)', opacity: 1 }}
                 />
 
                 {/* Left / Right Navigation Arrows */}
@@ -747,7 +748,7 @@ function Events() {
 
               {/* Bottom Thumbnail Dock */}
               {activeLightbox.images.length > 1 && (
-                <div className="mt-3 z-10 flex gap-2 overflow-x-auto max-w-4xl rounded-xl bg-neutral-900/95 p-2 border border-white/20 shadow-2xl pointer-events-auto">
+                <div className="mt-3 z-10 flex gap-2 overflow-x-auto max-w-4xl rounded-xl bg-neutral-900/95 p-2 border border-white/20 shadow-2xl">
                   {activeLightbox.images.map((imgUrl, idx) => (
                     <button
                       key={idx}
