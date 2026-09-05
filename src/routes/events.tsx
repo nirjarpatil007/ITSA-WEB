@@ -649,31 +649,28 @@ function Events() {
           ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {activeLightbox && (
-          <div className="fixed inset-0 z-[99999] flex items-center justify-center select-none">
-            {/* Dedicated Layer 1: Dark Semi-Transparent Backdrop (z-index: 999) */}
+          <>
+            {/* 1. Dedicated Backdrop Overlay (Sibling, z-50, bg-black/80) */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.15 }}
               onClick={() => setActiveLightbox(null)}
-              style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
-              className="fixed inset-0 z-[999] backdrop-blur-sm cursor-pointer"
+              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm cursor-pointer"
               aria-label="Close modal background"
             />
 
-            {/* Dedicated Layer 2: Modal Content Wrapper (z-index: 1000) */}
+            {/* 2. Content Wrapper Containing Expanded Image (Sibling, z-[100]) */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.2 }}
-              className="relative z-[1000] flex flex-col items-center justify-between w-full h-full max-w-6xl p-4 sm:p-6 pointer-events-none"
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="fixed left-[50%] top-[50%] z-[100] translate-x-[-50%] translate-y-[-50%] flex flex-col items-center justify-between w-full max-w-5xl max-h-[95vh] p-4 pointer-events-none select-none"
             >
               {/* Top Toolbar */}
-              <div 
-                className="w-full flex items-center justify-between z-[1002] mb-3 px-1 pointer-events-auto"
-              >
+              <div className="w-full flex items-center justify-between z-10 mb-3 px-1 pointer-events-auto">
                 <div className="flex items-center gap-3 rounded-full bg-neutral-900/95 px-4 py-2 border border-white/20 shadow-2xl">
                   <span className="size-2 rounded-full bg-primary animate-pulse" />
                   <span className="font-mono text-xs font-bold text-white tracking-wide">
@@ -685,7 +682,7 @@ function Events() {
                   </span>
                 </div>
 
-                {/* Top-Right Close Button */}
+                {/* Prominent 'X' Close Button */}
                 <button
                   type="button"
                   onClick={() => setActiveLightbox(null)}
@@ -696,20 +693,13 @@ function Events() {
                 </button>
               </div>
 
-              {/* Centered Image Container - Pure Crisp Display with zero inherited dimming */}
-              <div
-                className="relative flex items-center justify-center max-h-[75vh] w-full my-auto pointer-events-auto"
-              >
+              {/* Centered Expanded Image - Pure Vibrant Colors with zero dimming/opacity */}
+              <div className="relative flex items-center justify-center max-h-[75vh] w-full my-auto pointer-events-auto">
                 <img
                   key={activeLightbox.images[activeLightbox.currentIndex]}
                   src={activeLightbox.images[activeLightbox.currentIndex]}
                   alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                  style={{
-                    opacity: 1,
-                    filter: "brightness(100%) contrast(100%)",
-                    WebkitFilter: "brightness(100%) contrast(100%)",
-                  }}
-                  className="max-h-[72vh] max-w-full object-contain rounded-xl shadow-2xl block relative z-[1001] bg-black/40 border border-white/10"
+                  className="max-h-[74vh] max-w-full object-contain rounded-xl shadow-2xl block"
                 />
 
                 {/* Left / Right Navigation Arrows */}
@@ -728,7 +718,7 @@ function Events() {
                             : null
                         );
                       }}
-                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-[1003] flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
                       aria-label="Previous photo"
                     >
                       ‹
@@ -746,7 +736,7 @@ function Events() {
                             : null
                         );
                       }}
-                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-[1003] flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
                       aria-label="Next photo"
                     >
                       ›
@@ -757,9 +747,7 @@ function Events() {
 
               {/* Bottom Thumbnail Dock */}
               {activeLightbox.images.length > 1 && (
-                <div
-                  className="mt-3 z-[1002] flex gap-2 overflow-x-auto max-w-4xl rounded-xl bg-neutral-900/95 p-2 border border-white/20 shadow-2xl pointer-events-auto"
-                >
+                <div className="mt-3 z-10 flex gap-2 overflow-x-auto max-w-4xl rounded-xl bg-neutral-900/95 p-2 border border-white/20 shadow-2xl pointer-events-auto">
                   {activeLightbox.images.map((imgUrl, idx) => (
                     <button
                       key={idx}
@@ -783,7 +771,7 @@ function Events() {
                 </div>
               )}
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
     </>
