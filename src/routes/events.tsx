@@ -367,6 +367,17 @@ function Events() {
                               }`}
                             >
                               <figure
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(ev) => {
+                                  if ((ev.key === "Enter" || ev.key === " ") && e.images && e.images.length > 0) {
+                                    setActiveLightbox({
+                                      eventName: e.name,
+                                      images: e.images,
+                                      currentIndex: 0,
+                                    });
+                                  }
+                                }}
                                 onClick={() => {
                                   if (e.images && e.images.length > 0) {
                                     setActiveLightbox({
@@ -376,14 +387,14 @@ function Events() {
                                     });
                                   }
                                 }}
-                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-pointer border border-border min-h-[220px] transition-all hover:border-primary/50"
                               >
                                 {e.images?.[0] ? (
                                   <img
                                     src={e.images[0]}
                                     alt={e.name}
                                     loading={i < 2 ? "eager" : "lazy"}
-                                    className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
                                   />
                                 ) : (
                                   <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
@@ -394,7 +405,7 @@ function Events() {
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg pointer-events-none">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
@@ -523,6 +534,17 @@ function Events() {
                               }`}
                             >
                               <figure
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(ev) => {
+                                  if ((ev.key === "Enter" || ev.key === " ") && e.images && e.images.length > 0) {
+                                    setActiveLightbox({
+                                      eventName: e.name,
+                                      images: e.images,
+                                      currentIndex: 0,
+                                    });
+                                  }
+                                }}
                                 onClick={() => {
                                   if (e.images && e.images.length > 0) {
                                     setActiveLightbox({
@@ -532,14 +554,14 @@ function Events() {
                                     });
                                   }
                                 }}
-                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-pointer border border-border min-h-[220px] transition-all hover:border-primary/50"
                               >
                                 {e.images?.[0] ? (
                                   <img
                                     src={e.images[0]}
                                     alt={e.name}
                                     loading={i < 2 ? "eager" : "lazy"}
-                                    className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    className="aspect-[16/10] w-full object-cover transition-transform duration-500 group-hover:scale-105 cursor-pointer"
                                   />
                                 ) : (
                                   <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
@@ -550,7 +572,7 @@ function Events() {
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1.5 text-[11px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10 shadow-lg pointer-events-none">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
@@ -590,7 +612,7 @@ function Events() {
                                               currentIndex: si,
                                             });
                                           }}
-                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2"
+                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2 transition-transform hover:scale-105"
                                         >
                                           <img
                                             src={src}
@@ -633,14 +655,15 @@ function Events() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={() => setActiveLightbox(null)}
-            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-xl cursor-zoom-out select-none"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+            className="fixed inset-0 z-[999999] flex flex-col items-center justify-between p-4 sm:p-6 backdrop-blur-md cursor-zoom-out select-none"
           >
-            {/* Top Toolbar */}
+            {/* Top Toolbar with Title and Top-Right Close Button */}
             <div 
               onClick={(e) => e.stopPropagation()} 
-              className="w-full max-w-5xl flex items-center justify-between z-30 mb-3 px-2 cursor-default"
+              className="w-full max-w-5xl flex items-center justify-between z-30 mb-2 px-1 cursor-default"
             >
-              <div className="flex items-center gap-3 rounded-full bg-neutral-900/90 px-4 py-2 backdrop-blur-md border border-white/20 shadow-lg">
+              <div className="flex items-center gap-3 rounded-full bg-neutral-900/90 px-4 py-1.5 backdrop-blur-md border border-white/20 shadow-lg">
                 <span className="size-2 rounded-full bg-primary animate-pulse" />
                 <span className="font-mono text-xs font-bold text-white tracking-wide">
                   {activeLightbox.eventName}
@@ -651,27 +674,27 @@ function Events() {
                 </span>
               </div>
 
-              {/* Close button */}
+              {/* Prominent 'X' Close Button */}
               <button
                 type="button"
                 onClick={() => setActiveLightbox(null)}
-                className="flex size-10 items-center justify-center rounded-full bg-neutral-900/90 border border-white/20 text-white transition-all hover:bg-neutral-800 hover:scale-105 focus:outline-none shadow-lg cursor-pointer"
+                className="flex size-11 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white transition-all hover:bg-neutral-800 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
                 aria-label="Close image preview"
               >
                 <span className="font-mono text-2xl font-light leading-none">×</span>
               </button>
             </div>
 
-            {/* Centered Main Image Presentation Box */}
+            {/* Centered Main Image Container - Preserves original aspect ratio and scales responsively */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative flex items-center justify-center max-h-[72vh] max-w-5xl w-full rounded-2xl bg-neutral-950/90 border border-white/20 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
+              className="relative flex items-center justify-center max-h-[75vh] max-w-5xl w-full rounded-2xl bg-neutral-950/80 border border-white/15 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
             >
               <img
                 key={activeLightbox.images[activeLightbox.currentIndex]}
                 src={activeLightbox.images[activeLightbox.currentIndex]}
                 alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                className="max-h-[68vh] max-w-full object-contain rounded-lg block shadow-lg"
+                className="max-h-[70vh] max-w-full object-contain rounded-lg block shadow-lg"
               />
 
               {/* Left / Right Navigation Arrows */}
@@ -723,7 +746,7 @@ function Events() {
             {activeLightbox.images.length > 1 && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="mt-3 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/20 shadow-xl cursor-default"
+                className="mt-2 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/20 shadow-xl cursor-default"
               >
                 {activeLightbox.images.map((imgUrl, idx) => (
                   <button
