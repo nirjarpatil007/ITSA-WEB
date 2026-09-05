@@ -38,6 +38,18 @@ function getEventCategory(name: string, overview: string): string {
   return "career";
 }
 
+/**
+ * Optimizes Cloudinary URLs to serve compressed WebP/AVIF images scaled to target width.
+ * Reduces file size from ~5MB down to ~40KB for instant loading.
+ */
+function getOptimizedImageUrl(url: string, width = 800): string {
+  if (!url) return "";
+  if (url.includes("res.cloudinary.com") && url.includes("/image/upload/")) {
+    return url.replace("/image/upload/", `/image/upload/f_auto,q_auto:eco,w_${width}/`);
+  }
+  return url;
+}
+
 const title = "Events & Initiatives — ITSA PCCoE Pune";
 const description =
   "Every ITSA event at PCCoE Pune: BRUTEFORGE, AI expert sessions, higher-studies guidance, NSS drives and more.";
@@ -49,6 +61,10 @@ export const Route = createFileRoute("/events")({
       { name: "description", content: description },
       { property: "og:title", content: title },
       { property: "og:description", content: description },
+    ],
+    links: [
+      { rel: "preconnect", href: "https://res.cloudinary.com" },
+      { rel: "dns-prefetch", href: "https://res.cloudinary.com" },
     ],
   }),
   component: Events,
@@ -71,7 +87,7 @@ function Events() {
   // Lightbox modal state for expandable images
   const [activeLightbox, setActiveLightbox] = useState<ActiveLightbox | null>(null);
 
-  // Keyboard navigation for Lightbox
+  // Keyboard navigation & preloading for Lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!activeLightbox) return;
@@ -98,9 +114,23 @@ function Events() {
         );
       }
     };
+
     if (activeLightbox) {
       window.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
+
+      // Preload next and previous images in background for instantaneous transitions
+      const { images, currentIndex } = activeLightbox;
+      if (images.length > 1) {
+        const nextIdx = (currentIndex + 1) % images.length;
+        const prevIdx = (currentIndex - 1 + images.length) % images.length;
+        [images[nextIdx], images[prevIdx]].forEach((src) => {
+          if (src) {
+            const img = new Image();
+            img.src = getOptimizedImageUrl(src, 1200);
+          }
+        });
+      }
     }
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
@@ -370,13 +400,14 @@ function Events() {
                                     currentIndex: 0,
                                   })
                                 }
-                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
                               >
                                 {e.images?.[0] ? (
                                   <img
-                                    src={e.images[0]}
+                                    src={getOptimizedImageUrl(e.images[0], 900)}
                                     alt={e.name}
-                                    loading="lazy"
+                                    loading={i < 2 ? "eager" : "lazy"}
+                                    decoding="async"
                                     className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
@@ -384,11 +415,11 @@ function Events() {
                                     ITSA
                                   </div>
                                 )}
-                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
+                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground z-10">
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
@@ -428,12 +459,13 @@ function Events() {
                                               currentIndex: si,
                                             })
                                           }
-                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
+                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2"
                                         >
                                           <img
-                                            src={src}
+                                            src={getOptimizedImageUrl(src, 200)}
                                             alt=""
                                             loading="lazy"
+                                            decoding="async"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
                                           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
@@ -525,13 +557,14 @@ function Events() {
                                     currentIndex: 0,
                                   })
                                 }
-                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border min-h-[220px]"
                               >
                                 {e.images?.[0] ? (
                                   <img
-                                    src={e.images[0]}
+                                    src={getOptimizedImageUrl(e.images[0], 900)}
                                     alt={e.name}
-                                    loading="lazy"
+                                    loading={i < 2 ? "eager" : "lazy"}
+                                    decoding="async"
                                     className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
@@ -539,11 +572,11 @@ function Events() {
                                     ITSA
                                   </div>
                                 )}
-                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
+                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground z-10">
                                   {e.date}
                                 </figcaption>
                                 {e.images && e.images.length > 0 && (
-                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100 z-10">
                                     <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
@@ -583,12 +616,13 @@ function Events() {
                                               currentIndex: si,
                                             })
                                           }
-                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
+                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary bg-surface-2"
                                         >
                                           <img
-                                            src={src}
+                                            src={getOptimizedImageUrl(src, 200)}
                                             alt=""
                                             loading="lazy"
+                                            decoding="async"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
                                           <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
@@ -624,7 +658,7 @@ function Events() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
             onClick={() => setActiveLightbox(null)}
             className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-8 backdrop-blur-xl cursor-zoom-out select-none"
           >
@@ -652,20 +686,20 @@ function Events() {
               </button>
             </div>
 
-            {/* Centered Main Image Presentation Container — Guaranteed Fixed & Symmetrical */}
+            {/* Centered Main Image Presentation Container */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative flex items-center justify-center max-h-[75vh] max-w-[92vw] cursor-default my-auto"
+              className="relative flex items-center justify-center max-h-[75vh] max-w-[92vw] cursor-default my-auto min-h-[300px] min-w-[300px]"
             >
               <AnimatePresence mode="wait">
                 <motion.img
                   key={activeLightbox.images[activeLightbox.currentIndex]}
-                  src={activeLightbox.images[activeLightbox.currentIndex]}
+                  src={getOptimizedImageUrl(activeLightbox.images[activeLightbox.currentIndex], 1400)}
                   alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
                   className="max-h-[72vh] max-w-[90vw] object-contain rounded-lg border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
                 />
               </AnimatePresence>
@@ -731,7 +765,12 @@ function Events() {
                           : "opacity-45 hover:opacity-80"
                       }`}
                     >
-                      <img src={imgUrl} alt="" className="size-full object-cover" />
+                      <img
+                        src={getOptimizedImageUrl(imgUrl, 160)}
+                        alt=""
+                        className="size-full object-cover"
+                        loading="lazy"
+                      />
                     </button>
                   ))}
                 </div>
@@ -743,5 +782,6 @@ function Events() {
     </>
   );
 }
+
 
 
