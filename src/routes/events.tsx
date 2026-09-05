@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 
 import { Reveal, SplitWords } from "@/components/fx/motion-primitives";
@@ -61,6 +61,26 @@ function Events() {
   // Year dropdown states: both open by default
   const [open2026_27, setOpen2026_27] = useState(true);
   const [open2025_26, setOpen2025_26] = useState(true);
+
+  // Lightbox modal state for expandable images
+  const [activeImage, setActiveImage] = useState<{ src: string; alt: string; title?: string } | null>(null);
+
+  // Close modal on Escape key press and prevent background scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveImage(null);
+      }
+    };
+    if (activeImage) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [activeImage]);
 
   const filteredEvents = useMemo(() => {
     return allEvents.filter((e) => {
@@ -315,13 +335,16 @@ function Events() {
                                 flip ? "lg:[&>figure]:order-2" : ""
                               }`}
                             >
-                              <figure className="group relative overflow-hidden bg-surface-2">
+                              <figure
+                                onClick={() => e.images?.[0] && setActiveImage({ src: e.images[0], alt: e.name, title: e.name })}
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
+                              >
                                 {e.images?.[0] ? (
                                   <img
                                     src={e.images[0]}
                                     alt={e.name}
                                     loading="lazy"
-                                    className="aspect-[16/10] w-full object-cover grayscale transition-all duration-[900ms] group-hover:scale-105 group-hover:grayscale-0"
+                                    className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
                                   <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
@@ -331,6 +354,13 @@ function Events() {
                                 <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
                                   {e.date}
                                 </figcaption>
+                                {e.images?.[0] && (
+                                  <div className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                    </svg>
+                                  </div>
+                                )}
                               </figure>
 
                               <div className={flip ? "lg:pr-8" : "lg:pl-8"}>
@@ -348,16 +378,28 @@ function Events() {
                                 </p>
 
                                 {e.images && e.images.length > 1 ? (
-                                  <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
-                                    {e.images.slice(1, 6).map((src, si) => (
-                                      <img
-                                        key={`${e.id}-${si}`}
-                                        src={src}
-                                        alt=""
-                                        loading="lazy"
-                                        className="size-20 shrink-0 object-cover grayscale transition-all duration-500 hover:grayscale-0"
-                                      />
-                                    ))}
+                                  <div className="mt-6">
+                                    <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                                      Gallery ({e.images.length} photos) — Click to view
+                                    </p>
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                      {e.images.map((src, si) => (
+                                        <button
+                                          key={`${e.id}-${si}`}
+                                          type="button"
+                                          onClick={() => setActiveImage({ src, alt: `${e.name} photo ${si + 1}`, title: `${e.name} (Photo ${si + 1} of ${e.images!.length})` })}
+                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
+                                        >
+                                          <img
+                                            src={src}
+                                            alt=""
+                                            loading="lazy"
+                                            className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                          />
+                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+                                        </button>
+                                      ))}
+                                    </div>
                                   </div>
                                 ) : null}
                               </div>
@@ -430,13 +472,16 @@ function Events() {
                                 flip ? "lg:[&>figure]:order-2" : ""
                               }`}
                             >
-                              <figure className="group relative overflow-hidden bg-surface-2">
+                              <figure
+                                onClick={() => e.images?.[0] && setActiveImage({ src: e.images[0], alt: e.name, title: e.name })}
+                                className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
+                              >
                                 {e.images?.[0] ? (
                                   <img
                                     src={e.images[0]}
                                     alt={e.name}
                                     loading="lazy"
-                                    className="aspect-[16/10] w-full object-cover grayscale transition-all duration-[900ms] group-hover:scale-105 group-hover:grayscale-0"
+                                    className="aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-105"
                                   />
                                 ) : (
                                   <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
@@ -446,6 +491,13 @@ function Events() {
                                 <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
                                   {e.date}
                                 </figcaption>
+                                {e.images?.[0] && (
+                                  <div className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                                    </svg>
+                                  </div>
+                                )}
                               </figure>
 
                               <div className={flip ? "lg:pr-8" : "lg:pl-8"}>
@@ -463,16 +515,28 @@ function Events() {
                                 </p>
 
                                 {e.images && e.images.length > 1 ? (
-                                  <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
-                                    {e.images.slice(1, 6).map((src, si) => (
-                                      <img
-                                        key={`${e.id}-${si}`}
-                                        src={src}
-                                        alt=""
-                                        loading="lazy"
-                                        className="size-20 shrink-0 object-cover grayscale transition-all duration-500 hover:grayscale-0"
-                                      />
-                                    ))}
+                                  <div className="mt-6">
+                                    <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                                      Gallery ({e.images.length} photos) — Click to view
+                                    </p>
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                      {e.images.map((src, si) => (
+                                        <button
+                                          key={`${e.id}-${si}`}
+                                          type="button"
+                                          onClick={() => setActiveImage({ src, alt: `${e.name} photo ${si + 1}`, title: `${e.name} (Photo ${si + 1} of ${e.images!.length})` })}
+                                          className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
+                                        >
+                                          <img
+                                            src={src}
+                                            alt=""
+                                            loading="lazy"
+                                            className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                          />
+                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+                                        </button>
+                                      ))}
+                                    </div>
                                   </div>
                                 ) : null}
                               </div>
@@ -488,6 +552,59 @@ function Events() {
           </div>
         </div>
       </section>
+
+      {/* ════════════════════════════════════════════════════════════
+          LIGHTBOX / EXPANDED IMAGE MODAL
+          ════════════════════════════════════════════════════════════ */}
+      <AnimatePresence>
+        {activeImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setActiveImage(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8 backdrop-blur-md cursor-zoom-out"
+          >
+            {/* Close button */}
+            <button
+              type="button"
+              onClick={() => setActiveImage(null)}
+              className="absolute right-4 top-4 z-10 flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 focus:outline-none"
+              aria-label="Close image preview"
+            >
+              <span className="font-mono text-2xl font-light leading-none">×</span>
+            </button>
+
+            {/* Modal Content Container */}
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative max-h-[90vh] max-w-[92vw] overflow-hidden rounded-lg border border-white/20 bg-black/95 shadow-2xl"
+            >
+              <img
+                src={activeImage.src}
+                alt={activeImage.alt}
+                className="max-h-[80vh] max-w-[90vw] object-contain rounded-t-lg mx-auto"
+              />
+              {activeImage.title && (
+                <div className="flex items-center justify-between border-t border-white/10 bg-black/90 px-5 py-3 text-white backdrop-blur-sm">
+                  <p className="font-mono text-xs tracking-wider text-gray-200">
+                    {activeImage.title}
+                  </p>
+                  <span className="font-mono text-[10px] text-gray-400">
+                    ESC or click outside to close
+                  </span>
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }
+
