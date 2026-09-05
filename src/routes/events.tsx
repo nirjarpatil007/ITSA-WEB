@@ -649,128 +649,141 @@ function Events() {
           ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {activeLightbox && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setActiveLightbox(null)}
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
-            className="fixed inset-0 z-[999999] flex flex-col items-center justify-between p-4 sm:p-6 backdrop-blur-md cursor-zoom-out select-none"
-          >
-            {/* Top Toolbar with Title and Top-Right Close Button */}
-            <div 
-              onClick={(e) => e.stopPropagation()} 
-              className="w-full max-w-5xl flex items-center justify-between z-30 mb-2 px-1 cursor-default"
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center select-none">
+            {/* Dedicated Layer 1: Dark Semi-Transparent Backdrop (z-index: 999) */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setActiveLightbox(null)}
+              style={{ backgroundColor: "rgba(0, 0, 0, 0.85)" }}
+              className="fixed inset-0 z-[999] backdrop-blur-sm cursor-pointer"
+              aria-label="Close modal background"
+            />
+
+            {/* Dedicated Layer 2: Modal Content Wrapper (z-index: 1000) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.2 }}
+              className="relative z-[1000] flex flex-col items-center justify-between w-full h-full max-w-6xl p-4 sm:p-6 pointer-events-none"
             >
-              <div className="flex items-center gap-3 rounded-full bg-neutral-900/90 px-4 py-1.5 backdrop-blur-md border border-white/20 shadow-lg">
-                <span className="size-2 rounded-full bg-primary animate-pulse" />
-                <span className="font-mono text-xs font-bold text-white tracking-wide">
-                  {activeLightbox.eventName}
-                </span>
-                <span className="text-white/40">|</span>
-                <span className="font-mono text-xs text-white/80">
-                  Photo {activeLightbox.currentIndex + 1} of {activeLightbox.images.length}
-                </span>
+              {/* Top Toolbar */}
+              <div 
+                className="w-full flex items-center justify-between z-[1002] mb-3 px-1 pointer-events-auto"
+              >
+                <div className="flex items-center gap-3 rounded-full bg-neutral-900/95 px-4 py-2 border border-white/20 shadow-2xl">
+                  <span className="size-2 rounded-full bg-primary animate-pulse" />
+                  <span className="font-mono text-xs font-bold text-white tracking-wide">
+                    {activeLightbox.eventName}
+                  </span>
+                  <span className="text-white/40">|</span>
+                  <span className="font-mono text-xs text-white/80">
+                    Photo {activeLightbox.currentIndex + 1} of {activeLightbox.images.length}
+                  </span>
+                </div>
+
+                {/* Top-Right Close Button */}
+                <button
+                  type="button"
+                  onClick={() => setActiveLightbox(null)}
+                  className="flex size-11 items-center justify-center rounded-full bg-neutral-900/95 border border-white/25 text-white transition-all hover:bg-neutral-800 hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
+                  aria-label="Close image preview"
+                >
+                  <span className="font-mono text-2xl font-light leading-none">×</span>
+                </button>
               </div>
 
-              {/* Prominent 'X' Close Button */}
-              <button
-                type="button"
-                onClick={() => setActiveLightbox(null)}
-                className="flex size-11 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white transition-all hover:bg-neutral-800 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
-                aria-label="Close image preview"
-              >
-                <span className="font-mono text-2xl font-light leading-none">×</span>
-              </button>
-            </div>
-
-            {/* Centered Main Image Container - Preserves original aspect ratio and scales responsively */}
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="relative flex items-center justify-center max-h-[75vh] max-w-5xl w-full rounded-2xl bg-neutral-950/80 border border-white/15 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
-            >
-              <img
-                key={activeLightbox.images[activeLightbox.currentIndex]}
-                src={activeLightbox.images[activeLightbox.currentIndex]}
-                alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                className="max-h-[70vh] max-w-full object-contain rounded-lg block shadow-lg"
-              />
-
-              {/* Left / Right Navigation Arrows */}
-              {activeLightbox.images.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveLightbox((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              currentIndex:
-                                (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
-                            }
-                          : null
-                      );
-                    }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-black/80 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
-                    aria-label="Previous photo"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveLightbox((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              currentIndex:
-                                (prev.currentIndex + 1) % prev.images.length,
-                            }
-                          : null
-                      );
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-black/80 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
-                    aria-label="Next photo"
-                  >
-                    ›
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Bottom Thumbnail Dock */}
-            {activeLightbox.images.length > 1 && (
+              {/* Centered Image Container - Pure Crisp Display with zero inherited dimming */}
               <div
-                onClick={(e) => e.stopPropagation()}
-                className="mt-2 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/20 shadow-xl cursor-default"
+                className="relative flex items-center justify-center max-h-[75vh] w-full my-auto pointer-events-auto"
               >
-                {activeLightbox.images.map((imgUrl, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => {
-                      if (idx !== activeLightbox.currentIndex) {
+                <img
+                  key={activeLightbox.images[activeLightbox.currentIndex]}
+                  src={activeLightbox.images[activeLightbox.currentIndex]}
+                  alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
+                  style={{
+                    opacity: 1,
+                    filter: "brightness(100%) contrast(100%)",
+                    WebkitFilter: "brightness(100%) contrast(100%)",
+                  }}
+                  className="max-h-[72vh] max-w-full object-contain rounded-xl shadow-2xl block relative z-[1001] bg-black/40 border border-white/10"
+                />
+
+                {/* Left / Right Navigation Arrows */}
+                {activeLightbox.images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => {
                         setActiveLightbox((prev) =>
-                          prev ? { ...prev, currentIndex: idx } : null
+                          prev
+                            ? {
+                                ...prev,
+                                currentIndex:
+                                  (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+                              }
+                            : null
                         );
-                      }
-                    }}
-                    className={`size-14 shrink-0 overflow-hidden rounded-lg transition-all border cursor-pointer ${
-                      idx === activeLightbox.currentIndex
-                        ? "border-primary ring-2 ring-primary/50 scale-105 opacity-100"
-                        : "border-white/10 opacity-50 hover:opacity-85"
-                    }`}
-                  >
-                    <img src={imgUrl} alt="" className="size-full object-cover" />
-                  </button>
-                ))}
+                      }}
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-[1003] flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
+                      aria-label="Previous photo"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveLightbox((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                currentIndex:
+                                  (prev.currentIndex + 1) % prev.images.length,
+                              }
+                            : null
+                        );
+                      }}
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-[1003] flex size-12 items-center justify-center rounded-full bg-neutral-900/90 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-2xl cursor-pointer"
+                      aria-label="Next photo"
+                    >
+                      ›
+                    </button>
+                  </>
+                )}
               </div>
-            )}
-          </motion.div>
+
+              {/* Bottom Thumbnail Dock */}
+              {activeLightbox.images.length > 1 && (
+                <div
+                  className="mt-3 z-[1002] flex gap-2 overflow-x-auto max-w-4xl rounded-xl bg-neutral-900/95 p-2 border border-white/20 shadow-2xl pointer-events-auto"
+                >
+                  {activeLightbox.images.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => {
+                        if (idx !== activeLightbox.currentIndex) {
+                          setActiveLightbox((prev) =>
+                            prev ? { ...prev, currentIndex: idx } : null
+                          );
+                        }
+                      }}
+                      className={`size-14 shrink-0 overflow-hidden rounded-lg transition-all border cursor-pointer ${
+                        idx === activeLightbox.currentIndex
+                          ? "border-primary ring-2 ring-primary/60 scale-105 opacity-100"
+                          : "border-white/10 opacity-50 hover:opacity-90"
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="size-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </>
