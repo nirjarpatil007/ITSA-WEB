@@ -1,9 +1,7 @@
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { Marquee } from "@/components/fx/marquee";
-import { Magnetic, Reveal, SplitWords } from "@/components/fx/motion-primitives";
+import { HeroSequence } from "@/components/fx/hero-sequence";
+import { Reveal, SplitWords } from "@/components/fx/motion-primitives";
 import { clubs } from "@/data/clubs";
 import { itsa } from "@/data/itsa";
 
@@ -24,86 +22,10 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const shift = useTransform(scrollYProgress, [0, 1], ["0%", reduced ? "0%" : "-8%"]);
-  const fade = useTransform(scrollYProgress, [0, 0.85], [1, reduced ? 1 : 0.25]);
-
-
   return (
     <>
-      {/* HERO — asymmetric editorial slab */}
-      <section ref={heroRef} className="relative min-h-[100svh] overflow-hidden pt-24">
-        <div aria-hidden className="grid-paper pointer-events-none absolute inset-0" />
-
-        <motion.div style={{ y: shift, opacity: fade }} className="relative">
-          <div className="mx-auto max-w-[1600px] px-5 sm:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-foreground/20 pb-3">
-              <p className="label-mono">Est. Department of Information Technology</p>
-              <p className="label-mono">PCCoE · Pune · India</p>
-            </div>
-
-            <div className="grid gap-8 pt-8 lg:grid-cols-[1.6fr_1fr]">
-              <div>
-                <SplitWords as="h1" text="Information Technology" className="display-xl" />
-                <div className="relative">
-                  <SplitWords
-                    as="h1"
-                    text="Students' Association"
-                    delay={0.18}
-                    className="display-xl text-outline"
-                  />
-                </div>
-                <motion.div
-                  initial={reduced ? false : { scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 0.5, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-                  style={{ transformOrigin: "left" }}
-                  className="mt-6 h-[6px] w-full bg-acid"
-                />
-              </div>
-
-              <Reveal delay={0.3} className="flex flex-col justify-end">
-                <p className="text-lg leading-relaxed text-muted-foreground">{itsa.tagline}</p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Magnetic>
-                    <Link
-                      to="/events"
-                      className="group inline-flex items-center gap-3 bg-foreground px-6 py-4 font-mono text-[11px] uppercase tracking-[0.2em] text-background"
-                    >
-                      Explore events
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
-                    </Link>
-                  </Magnetic>
-
-                </div>
-
-                <div className="mt-10 border-l-[6px] border-primary pl-4">
-                  <p className="label-mono">Next up</p>
-                  <p className="mt-2 font-display text-3xl font-extrabold tracking-tight">
-                    {itsa.highlight.name}
-                  </p>
-                  <p className="mt-1 font-mono text-xs text-primary">{itsa.highlight.date}</p>
-                  <p className="mt-2 text-sm text-muted-foreground">{itsa.highlight.detail}</p>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-
-          <Marquee
-            className="mt-14 border-y border-foreground/20 bg-foreground py-3 font-mono text-[11px] uppercase tracking-[0.3em] text-background"
-            speed={34}
-            items={[
-              "18+ events",
-              "66 active members",
-              "14 specialised teams",
-              "IEEE · MLSC · GDGC · NSS",
-              "$5000 IEEE grant",
-            ]}
-          />
-        </motion.div>
-      </section>
+      {/* HERO — sequential animation timeline */}
+      <HeroSequence />
 
       {/* MANIFESTO */}
       <section className="mx-auto max-w-[1600px] px-5 py-24 sm:px-8 sm:py-32">
@@ -132,12 +54,19 @@ function Index() {
                 </Reveal>
               ))}
             </ul>
-
           </div>
         </div>
       </section>
 
-      {/* CLUB BENTO */}
+      {/* VISION SLAB — moved above the Ecosystem section */}
+      <section className="border-y border-foreground/20 bg-foreground px-5 py-24 text-background sm:px-8">
+        <div className="mx-auto max-w-[1600px]">
+          <p className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-70">Vision</p>
+          <SplitWords text={itsa.vision} className="mt-6 max-w-[24ch] display-md" />
+        </div>
+      </section>
+
+      {/* CLUB BENTO (Ecosystem) */}
       <section className="border-t border-foreground/20 bg-surface px-5 py-24 sm:px-8">
         <div className="mx-auto max-w-[1600px]">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -145,7 +74,6 @@ function Index() {
               <p className="label-mono">02 — The ecosystem</p>
               <h2 className="mt-4 display-md">Six wings, one association.</h2>
             </div>
-
           </div>
 
           <div className="mt-12 grid auto-rows-[minmax(180px,auto)] gap-4 md:grid-cols-3">
@@ -174,14 +102,6 @@ function Index() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* VISION SLAB */}
-      <section className="border-y border-foreground/20 bg-foreground px-5 py-24 text-background sm:px-8">
-        <div className="mx-auto max-w-[1600px]">
-          <p className="font-mono text-[11px] uppercase tracking-[0.22em] opacity-70">Vision</p>
-          <SplitWords text={itsa.vision} className="mt-6 max-w-[24ch] display-md" />
         </div>
       </section>
     </>
