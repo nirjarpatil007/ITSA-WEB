@@ -54,6 +54,12 @@ export const Route = createFileRoute("/events")({
   component: Events,
 });
 
+type ActiveLightbox = {
+  eventName: string;
+  images: string[];
+  currentIndex: number;
+};
+
 function Events() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -63,16 +69,36 @@ function Events() {
   const [open2025_26, setOpen2025_26] = useState(true);
 
   // Lightbox modal state for expandable images
-  const [activeImage, setActiveImage] = useState<{ src: string; alt: string; title?: string } | null>(null);
+  const [activeLightbox, setActiveLightbox] = useState<ActiveLightbox | null>(null);
 
-  // Close modal on Escape key press and prevent background scroll
+  // Keyboard navigation for Lightbox
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (!activeLightbox) return;
       if (e.key === "Escape") {
-        setActiveImage(null);
+        setActiveLightbox(null);
+      } else if (e.key === "ArrowLeft") {
+        setActiveLightbox((prev) =>
+          prev
+            ? {
+                ...prev,
+                currentIndex:
+                  (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+              }
+            : null
+        );
+      } else if (e.key === "ArrowRight") {
+        setActiveLightbox((prev) =>
+          prev
+            ? {
+                ...prev,
+                currentIndex: (prev.currentIndex + 1) % prev.images.length,
+              }
+            : null
+        );
       }
     };
-    if (activeImage) {
+    if (activeLightbox) {
       window.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
     }
@@ -80,7 +106,7 @@ function Events() {
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "unset";
     };
-  }, [activeImage]);
+  }, [activeLightbox]);
 
   const filteredEvents = useMemo(() => {
     return allEvents.filter((e) => {
@@ -336,7 +362,14 @@ function Events() {
                               }`}
                             >
                               <figure
-                                onClick={() => e.images?.[0] && setActiveImage({ src: e.images[0], alt: e.name, title: e.name })}
+                                onClick={() =>
+                                  e.images && e.images.length > 0 &&
+                                  setActiveLightbox({
+                                    eventName: e.name,
+                                    images: e.images,
+                                    currentIndex: 0,
+                                  })
+                                }
                                 className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
                               >
                                 {e.images?.[0] ? (
@@ -354,11 +387,12 @@ function Events() {
                                 <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
                                   {e.date}
                                 </figcaption>
-                                {e.images?.[0] && (
-                                  <div className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
-                                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {e.images && e.images.length > 0 && (
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                    <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
+                                    <span>Expand</span>
                                   </div>
                                 )}
                               </figure>
@@ -380,14 +414,20 @@ function Events() {
                                 {e.images && e.images.length > 1 ? (
                                   <div className="mt-6">
                                     <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                                      Gallery ({e.images.length} photos) — Click to view
+                                      Gallery ({e.images.length} photos) — Click to expand
                                     </p>
-                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                    <div className="flex gap-2.5 overflow-x-auto pb-2">
                                       {e.images.map((src, si) => (
                                         <button
                                           key={`${e.id}-${si}`}
                                           type="button"
-                                          onClick={() => setActiveImage({ src, alt: `${e.name} photo ${si + 1}`, title: `${e.name} (Photo ${si + 1} of ${e.images!.length})` })}
+                                          onClick={() =>
+                                            setActiveLightbox({
+                                              eventName: e.name,
+                                              images: e.images!,
+                                              currentIndex: si,
+                                            })
+                                          }
                                           className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
                                         >
                                           <img
@@ -396,7 +436,11 @@ function Events() {
                                             loading="lazy"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
-                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
+                                            <span className="text-white text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                                              +{si + 1}
+                                            </span>
+                                          </div>
                                         </button>
                                       ))}
                                     </div>
@@ -473,7 +517,14 @@ function Events() {
                               }`}
                             >
                               <figure
-                                onClick={() => e.images?.[0] && setActiveImage({ src: e.images[0], alt: e.name, title: e.name })}
+                                onClick={() =>
+                                  e.images && e.images.length > 0 &&
+                                  setActiveLightbox({
+                                    eventName: e.name,
+                                    images: e.images,
+                                    currentIndex: 0,
+                                  })
+                                }
                                 className="group relative overflow-hidden rounded bg-surface-2 cursor-zoom-in border border-border"
                               >
                                 {e.images?.[0] ? (
@@ -491,11 +542,12 @@ function Events() {
                                 <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
                                   {e.date}
                                 </figcaption>
-                                {e.images?.[0] && (
-                                  <div className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
-                                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {e.images && e.images.length > 0 && (
+                                  <div className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-mono text-white opacity-0 transition-opacity backdrop-blur-sm group-hover:opacity-100">
+                                    <svg className="size-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
                                     </svg>
+                                    <span>Expand</span>
                                   </div>
                                 )}
                               </figure>
@@ -517,14 +569,20 @@ function Events() {
                                 {e.images && e.images.length > 1 ? (
                                   <div className="mt-6">
                                     <p className="mb-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                                      Gallery ({e.images.length} photos) — Click to view
+                                      Gallery ({e.images.length} photos) — Click to expand
                                     </p>
-                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                    <div className="flex gap-2.5 overflow-x-auto pb-2">
                                       {e.images.map((src, si) => (
                                         <button
                                           key={`${e.id}-${si}`}
                                           type="button"
-                                          onClick={() => setActiveImage({ src, alt: `${e.name} photo ${si + 1}`, title: `${e.name} (Photo ${si + 1} of ${e.images!.length})` })}
+                                          onClick={() =>
+                                            setActiveLightbox({
+                                              eventName: e.name,
+                                              images: e.images!,
+                                              currentIndex: si,
+                                            })
+                                          }
                                           className="group relative size-20 shrink-0 overflow-hidden rounded border border-border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
                                         >
                                           <img
@@ -533,7 +591,11 @@ function Events() {
                                             loading="lazy"
                                             className="size-full object-cover transition-transform duration-300 group-hover:scale-110"
                                           />
-                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
+                                          <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/25 flex items-center justify-center">
+                                            <span className="text-white text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                                              +{si + 1}
+                                            </span>
+                                          </div>
                                         </button>
                                       ))}
                                     </div>
@@ -554,57 +616,132 @@ function Events() {
       </section>
 
       {/* ════════════════════════════════════════════════════════════
-          LIGHTBOX / EXPANDED IMAGE MODAL
+          LIGHTBOX / FULLSCREEN IMAGE MODAL
           ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
-        {activeImage && (
+        {activeLightbox && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setActiveImage(null)}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 sm:p-8 backdrop-blur-md cursor-zoom-out"
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={() => setActiveLightbox(null)}
+            className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/95 p-4 sm:p-8 backdrop-blur-xl cursor-zoom-out select-none"
           >
-            {/* Close button */}
-            <button
-              type="button"
-              onClick={() => setActiveImage(null)}
-              className="absolute right-4 top-4 z-10 flex size-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/25 focus:outline-none"
-              aria-label="Close image preview"
-            >
-              <span className="font-mono text-2xl font-light leading-none">×</span>
-            </button>
+            {/* Top Toolbar */}
+            <div className="absolute top-4 inset-x-4 sm:inset-x-8 flex items-center justify-between z-30 pointer-events-none">
+              <div className="flex items-center gap-2.5 rounded-full bg-white/10 px-4 py-1.5 backdrop-blur-md border border-white/15 pointer-events-auto">
+                <span className="size-2 rounded-full bg-primary animate-pulse" />
+                <span className="font-mono text-xs font-semibold text-white tracking-wide">
+                  {activeLightbox.eventName}
+                </span>
+                <span className="text-white/40">|</span>
+                <span className="font-mono text-xs text-white/70">
+                  {activeLightbox.currentIndex + 1} / {activeLightbox.images.length}
+                </span>
+              </div>
 
-            {/* Modal Content Container */}
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              {/* Close button */}
+              <button
+                type="button"
+                onClick={() => setActiveLightbox(null)}
+                className="pointer-events-auto flex size-10 items-center justify-center rounded-full bg-white/15 text-white transition-all hover:bg-white/30 hover:scale-105 focus:outline-none shadow-lg"
+                aria-label="Close image preview"
+              >
+                <span className="font-mono text-2xl font-light leading-none">×</span>
+              </button>
+            </div>
+
+            {/* Centered Main Image Presentation Container — Guaranteed Fixed & Symmetrical */}
+            <div
               onClick={(e) => e.stopPropagation()}
-              className="relative max-h-[90vh] max-w-[92vw] overflow-hidden rounded-lg border border-white/20 bg-black/95 shadow-2xl"
+              className="relative flex items-center justify-center max-h-[75vh] max-w-[92vw] cursor-default my-auto"
             >
-              <img
-                src={activeImage.src}
-                alt={activeImage.alt}
-                className="max-h-[80vh] max-w-[90vw] object-contain rounded-t-lg mx-auto"
-              />
-              {activeImage.title && (
-                <div className="flex items-center justify-between border-t border-white/10 bg-black/90 px-5 py-3 text-white backdrop-blur-sm">
-                  <p className="font-mono text-xs tracking-wider text-gray-200">
-                    {activeImage.title}
-                  </p>
-                  <span className="font-mono text-[10px] text-gray-400">
-                    ESC or click outside to close
-                  </span>
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeLightbox.images[activeLightbox.currentIndex]}
+                  src={activeLightbox.images[activeLightbox.currentIndex]}
+                  alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ duration: 0.22, ease: "easeOut" }}
+                  className="max-h-[72vh] max-w-[90vw] object-contain rounded-lg border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
+                />
+              </AnimatePresence>
+            </div>
+
+            {/* Navigation Arrows for multi-photo sets */}
+            {activeLightbox.images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveLightbox((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            currentIndex:
+                              (prev.currentIndex - 1 + prev.images.length) % prev.images.length,
+                          }
+                        : null
+                    );
+                  }}
+                  className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-white/15 text-white text-2xl font-light transition-all hover:bg-white/30 hover:scale-110 focus:outline-none shadow-lg"
+                  aria-label="Previous photo"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveLightbox((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            currentIndex:
+                              (prev.currentIndex + 1) % prev.images.length,
+                          }
+                        : null
+                    );
+                  }}
+                  className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-white/15 text-white text-2xl font-light transition-all hover:bg-white/30 hover:scale-110 focus:outline-none shadow-lg"
+                  aria-label="Next photo"
+                >
+                  ›
+                </button>
+
+                {/* Bottom Thumbnail Strip */}
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute bottom-4 z-30 flex gap-2.5 overflow-x-auto max-w-[92vw] rounded-xl bg-black/80 p-2 backdrop-blur-md border border-white/15 shadow-xl"
+                >
+                  {activeLightbox.images.map((imgUrl, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() =>
+                        setActiveLightbox((prev) => (prev ? { ...prev, currentIndex: idx } : null))
+                      }
+                      className={`size-12 shrink-0 overflow-hidden rounded-md transition-all ${
+                        idx === activeLightbox.currentIndex
+                          ? "ring-2 ring-primary scale-105 opacity-100"
+                          : "opacity-45 hover:opacity-80"
+                      }`}
+                    >
+                      <img src={imgUrl} alt="" className="size-full object-cover" />
+                    </button>
+                  ))}
                 </div>
-              )}
-            </motion.div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
     </>
   );
 }
+
 
