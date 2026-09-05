@@ -74,7 +74,6 @@ function Events() {
 
   // Lightbox modal state for expandable images
   const [activeLightbox, setActiveLightbox] = useState<ActiveLightbox | null>(null);
-  const [imageLoading, setImageLoading] = useState(false);
 
   // Keyboard navigation for Lightbox
   useEffect(() => {
@@ -370,7 +369,6 @@ function Events() {
                               <figure
                                 onClick={() => {
                                   if (e.images && e.images.length > 0) {
-                                    setImageLoading(true);
                                     setActiveLightbox({
                                       eventName: e.name,
                                       images: e.images,
@@ -430,7 +428,6 @@ function Events() {
                                           key={`${e.id}-${si}`}
                                           type="button"
                                           onClick={() => {
-                                            setImageLoading(true);
                                             setActiveLightbox({
                                               eventName: e.name,
                                               images: e.images!,
@@ -528,7 +525,6 @@ function Events() {
                               <figure
                                 onClick={() => {
                                   if (e.images && e.images.length > 0) {
-                                    setImageLoading(true);
                                     setActiveLightbox({
                                       eventName: e.name,
                                       images: e.images,
@@ -588,7 +584,6 @@ function Events() {
                                           key={`${e.id}-${si}`}
                                           type="button"
                                           onClick={() => {
-                                            setImageLoading(true);
                                             setActiveLightbox({
                                               eventName: e.name,
                                               images: e.images!,
@@ -636,12 +631,15 @@ function Events() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
+            transition={{ duration: 0.2 }}
             onClick={() => setActiveLightbox(null)}
             className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-black/90 p-4 sm:p-6 backdrop-blur-xl cursor-zoom-out select-none"
           >
             {/* Top Toolbar */}
-            <div className="w-full max-w-5xl flex items-center justify-between z-30 mb-3 px-2">
+            <div 
+              onClick={(e) => e.stopPropagation()} 
+              className="w-full max-w-5xl flex items-center justify-between z-30 mb-3 px-2 cursor-default"
+            >
               <div className="flex items-center gap-3 rounded-full bg-neutral-900/90 px-4 py-2 backdrop-blur-md border border-white/20 shadow-lg">
                 <span className="size-2 rounded-full bg-primary animate-pulse" />
                 <span className="font-mono text-xs font-bold text-white tracking-wide">
@@ -667,25 +665,13 @@ function Events() {
             {/* Centered Main Image Presentation Box */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative flex items-center justify-center max-h-[72vh] max-w-5xl w-full rounded-2xl bg-neutral-950/80 border border-white/15 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
+              className="relative flex items-center justify-center max-h-[72vh] max-w-5xl w-full rounded-2xl bg-neutral-950/90 border border-white/20 p-2 sm:p-4 shadow-2xl cursor-default my-auto overflow-hidden"
             >
-              {/* Spinner while loading */}
-              {imageLoading && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/70">
-                  <div className="size-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                  <span className="font-mono text-xs text-neutral-300">Loading photo...</span>
-                </div>
-              )}
-
               <img
                 key={activeLightbox.images[activeLightbox.currentIndex]}
                 src={activeLightbox.images[activeLightbox.currentIndex]}
                 alt={`${activeLightbox.eventName} photo ${activeLightbox.currentIndex + 1}`}
-                onLoad={() => setImageLoading(false)}
-                onError={() => setImageLoading(false)}
-                className={`max-h-[68vh] max-w-full object-contain rounded-lg transition-opacity duration-200 ${
-                  imageLoading ? "opacity-0" : "opacity-100"
-                }`}
+                className="max-h-[68vh] max-w-full object-contain rounded-lg block shadow-lg"
               />
 
               {/* Left / Right Navigation Arrows */}
@@ -695,7 +681,6 @@ function Events() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setImageLoading(true);
                       setActiveLightbox((prev) =>
                         prev
                           ? {
@@ -706,7 +691,7 @@ function Events() {
                           : null
                       );
                     }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex size-11 items-center justify-center rounded-full bg-black/70 border border-white/20 text-white text-2xl font-light transition-all hover:bg-black/90 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-black/80 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
                     aria-label="Previous photo"
                   >
                     ‹
@@ -715,7 +700,6 @@ function Events() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setImageLoading(true);
                       setActiveLightbox((prev) =>
                         prev
                           ? {
@@ -726,7 +710,7 @@ function Events() {
                           : null
                       );
                     }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex size-11 items-center justify-center rounded-full bg-black/70 border border-white/20 text-white text-2xl font-light transition-all hover:bg-black/90 hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-30 flex size-12 items-center justify-center rounded-full bg-black/80 border border-white/25 text-white text-3xl font-light transition-all hover:bg-black hover:scale-110 focus:outline-none shadow-xl cursor-pointer"
                     aria-label="Next photo"
                   >
                     ›
@@ -739,7 +723,7 @@ function Events() {
             {activeLightbox.images.length > 1 && (
               <div
                 onClick={(e) => e.stopPropagation()}
-                className="mt-3 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/15 shadow-xl"
+                className="mt-3 z-30 flex gap-2 overflow-x-auto max-w-5xl rounded-xl bg-neutral-900/90 p-2 backdrop-blur-md border border-white/20 shadow-xl cursor-default"
               >
                 {activeLightbox.images.map((imgUrl, idx) => (
                   <button
@@ -747,7 +731,6 @@ function Events() {
                     type="button"
                     onClick={() => {
                       if (idx !== activeLightbox.currentIndex) {
-                        setImageLoading(true);
                         setActiveLightbox((prev) =>
                           prev ? { ...prev, currentIndex: idx } : null
                         );
