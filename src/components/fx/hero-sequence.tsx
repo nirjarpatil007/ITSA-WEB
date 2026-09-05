@@ -177,7 +177,7 @@ export function HeroSequence() {
     if (reduced) return;
 
     try {
-      if (sessionStorage.getItem("itsa-hero-session-v8") === "done") {
+      if (sessionStorage.getItem("itsa-hero-session-v9") === "done") {
         setShowSimulation(false);
         return;
       }
@@ -189,7 +189,7 @@ export function HeroSequence() {
     timerRef.current = setTimeout(() => {
       finishSimulation();
       try {
-        sessionStorage.setItem("itsa-hero-session-v8", "done");
+        sessionStorage.setItem("itsa-hero-session-v9", "done");
       } catch {
         /* ignore */
       }
@@ -201,9 +201,9 @@ export function HeroSequence() {
   }, [reduced, finishSimulation]);
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#090a0c]">
+    <section className="relative min-h-[100svh] overflow-hidden bg-background text-foreground transition-colors duration-400">
       {/* ════════════════════════════════════════════════════════════
-          PHASE 1: Kinetic Simulation Overlay
+          PHASE 1: Kinetic Simulation Overlay (Runs on initial mount)
           ════════════════════════════════════════════════════════════ */}
       <AnimatePresence>
         {showSimulation && (
@@ -264,10 +264,10 @@ export function HeroSequence() {
       </AnimatePresence>
 
       {/* ════════════════════════════════════════════════════════════
-          PHASE 2: Permanent Dark Editorial Hero (Screenshot 2)
+          PHASE 2: Permanent Editorial Hero (Fully Light & Dark Compatible)
           ════════════════════════════════════════════════════════════ */}
       <div className="relative z-10 flex min-h-[100svh] flex-col justify-between pt-24">
-        {/* Dark grid paper background texture */}
+        {/* Theme-adaptive grid paper background texture */}
         <div aria-hidden className="grid-paper pointer-events-none absolute inset-0 opacity-40" />
 
         <div className="mx-auto w-full max-w-[1600px] px-5 sm:px-8">
@@ -299,7 +299,7 @@ export function HeroSequence() {
             </div>
 
             <Reveal delay={0.3} className="flex flex-col justify-end">
-              <p className="text-lg leading-relaxed text-muted-foreground">{itsa.tagline}</p>
+              <p className="text-base sm:text-lg leading-relaxed text-muted-foreground">{itsa.tagline}</p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Magnetic>
                   <Link
