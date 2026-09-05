@@ -58,9 +58,9 @@ function Events() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   
-  // Year dropdown states: 2025-26 open by default, 2026-27 toggleable
-  const [open2025_26, setOpen2025_26] = useState(true);
+  // Year dropdown states: both open by default
   const [open2026_27, setOpen2026_27] = useState(true);
+  const [open2025_26, setOpen2025_26] = useState(true);
 
   const filteredEvents = useMemo(() => {
     return allEvents.filter((e) => {
@@ -76,12 +76,12 @@ function Events() {
     });
   }, [selectedCategory, searchQuery]);
 
-  const events2025_26 = useMemo(() => {
-    return filteredEvents.filter((e) => !e.year || e.year === "2025-26");
-  }, [filteredEvents]);
-
   const events2026_27 = useMemo(() => {
     return filteredEvents.filter((e) => e.year === "2026-27");
+  }, [filteredEvents]);
+
+  const events2025_26 = useMemo(() => {
+    return filteredEvents.filter((e) => !e.year || e.year === "2025-26");
   }, [filteredEvents]);
 
   return (
@@ -231,127 +231,12 @@ function Events() {
       </header>
 
       {/* ════════════════════════════════════════════════════════════
-          TENURE SECTIONS ACCORDION (2025–26 & 2026–27)
+          TENURE SECTIONS ACCORDION (2026–27 above 2025–26)
           ════════════════════════════════════════════════════════════ */}
       <section className="mx-auto max-w-[1600px] px-5 py-12 sm:px-8">
         <div className="space-y-12">
           {/* ──────────────────────────────────────────────────────────
-              DROPDOWN SECTION: TENURE 2025–26
-              ────────────────────────────────────────────────────────── */}
-          <div className="border border-border bg-surface overflow-hidden">
-            <button
-              type="button"
-              onClick={() => setOpen2025_26((v) => !v)}
-              className="flex w-full items-center justify-between p-6 sm:p-8 text-left transition-colors hover:bg-surface-2"
-            >
-              <div>
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
-                    Academic Year
-                  </span>
-                  <span className="rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 font-mono text-[10px] text-primary font-bold">
-                    {events2025_26.length} Events
-                  </span>
-                </div>
-                <h2 className="mt-2 font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                  Tenure 2025–2026
-                </h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Competitions, expert workshops, NSS social drives and technical training.
-                </p>
-              </div>
-              <span
-                className={`grid size-10 place-items-center border border-border bg-background font-mono text-lg transition-transform duration-300 ${
-                  open2025_26 ? "rotate-180" : ""
-                }`}
-              >
-                ↓
-              </span>
-            </button>
-
-            <AnimatePresence initial={false}>
-              {open2025_26 && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.35, ease: "easeInOut" }}
-                  className="overflow-hidden border-t border-border bg-background p-6 sm:p-10"
-                >
-                  {events2025_26.length === 0 ? (
-                    <div className="py-12 text-center text-muted-foreground font-mono text-xs">
-                      No events in 2025–26 match your search criteria.
-                    </div>
-                  ) : (
-                    <div className="space-y-20">
-                      {events2025_26.map((e, i) => {
-                        const flip = i % 2 === 1;
-                        return (
-                          <Reveal key={e.id}>
-                            <article
-                              className={`grid items-center gap-8 border-t border-foreground/20 pt-8 lg:grid-cols-2 ${
-                                flip ? "lg:[&>figure]:order-2" : ""
-                              }`}
-                            >
-                              <figure className="group relative overflow-hidden bg-surface-2">
-                                {e.images?.[0] ? (
-                                  <img
-                                    src={e.images[0]}
-                                    alt={e.name}
-                                    loading="lazy"
-                                    className="aspect-[16/10] w-full object-cover grayscale transition-all duration-[900ms] group-hover:scale-105 group-hover:grayscale-0"
-                                  />
-                                ) : (
-                                  <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
-                                    ITSA
-                                  </div>
-                                )}
-                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
-                                  {e.date}
-                                </figcaption>
-                              </figure>
-
-                              <div className={flip ? "lg:pr-8" : "lg:pl-8"}>
-                                <div className="flex items-center gap-3">
-                                  <p className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground">
-                                    LOG {String(i + 1).padStart(2, "0")}
-                                  </p>
-                                  <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">
-                                    {getEventCategory(e.name, e.overview)}
-                                  </span>
-                                </div>
-                                <SplitWords text={e.name} className="mt-3 display-md" />
-                                <p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">
-                                  {e.overview}
-                                </p>
-
-                                {e.images && e.images.length > 1 ? (
-                                  <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
-                                    {e.images.slice(1, 6).map((src, si) => (
-                                      <img
-                                        key={`${e.id}-${si}`}
-                                        src={src}
-                                        alt=""
-                                        loading="lazy"
-                                        className="size-20 shrink-0 object-cover grayscale transition-all duration-500 hover:grayscale-0"
-                                      />
-                                    ))}
-                                  </div>
-                                ) : null}
-                              </div>
-                            </article>
-                          </Reveal>
-                        );
-                      })}
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* ──────────────────────────────────────────────────────────
-              DROPDOWN SECTION: TENURE 2026–27
+              DROPDOWN SECTION: TENURE 2026–27 (Placed Above)
               ────────────────────────────────────────────────────────── */}
           <div className="border border-border bg-surface overflow-hidden">
             <button
@@ -422,6 +307,121 @@ function Events() {
                   ) : (
                     <div className="space-y-20">
                       {events2026_27.map((e, i) => {
+                        const flip = i % 2 === 1;
+                        return (
+                          <Reveal key={e.id}>
+                            <article
+                              className={`grid items-center gap-8 border-t border-foreground/20 pt-8 lg:grid-cols-2 ${
+                                flip ? "lg:[&>figure]:order-2" : ""
+                              }`}
+                            >
+                              <figure className="group relative overflow-hidden bg-surface-2">
+                                {e.images?.[0] ? (
+                                  <img
+                                    src={e.images[0]}
+                                    alt={e.name}
+                                    loading="lazy"
+                                    className="aspect-[16/10] w-full object-cover grayscale transition-all duration-[900ms] group-hover:scale-105 group-hover:grayscale-0"
+                                  />
+                                ) : (
+                                  <div className="grid aspect-[16/10] w-full place-items-center font-display text-5xl font-extrabold text-outline">
+                                    ITSA
+                                  </div>
+                                )}
+                                <figcaption className="absolute bottom-0 left-0 bg-primary px-3 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-primary-foreground">
+                                  {e.date}
+                                </figcaption>
+                              </figure>
+
+                              <div className={flip ? "lg:pr-8" : "lg:pl-8"}>
+                                <div className="flex items-center gap-3">
+                                  <p className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground">
+                                    LOG {String(i + 1).padStart(2, "0")}
+                                  </p>
+                                  <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-primary">
+                                    {getEventCategory(e.name, e.overview)}
+                                  </span>
+                                </div>
+                                <SplitWords text={e.name} className="mt-3 display-md" />
+                                <p className="mt-4 max-w-xl leading-relaxed text-muted-foreground">
+                                  {e.overview}
+                                </p>
+
+                                {e.images && e.images.length > 1 ? (
+                                  <div className="mt-6 flex gap-2 overflow-x-auto pb-2">
+                                    {e.images.slice(1, 6).map((src, si) => (
+                                      <img
+                                        key={`${e.id}-${si}`}
+                                        src={src}
+                                        alt=""
+                                        loading="lazy"
+                                        className="size-20 shrink-0 object-cover grayscale transition-all duration-500 hover:grayscale-0"
+                                      />
+                                    ))}
+                                  </div>
+                                ) : null}
+                              </div>
+                            </article>
+                          </Reveal>
+                        );
+                      })}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* ──────────────────────────────────────────────────────────
+              DROPDOWN SECTION: TENURE 2025–26 (Placed Below)
+              ────────────────────────────────────────────────────────── */}
+          <div className="border border-border bg-surface overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setOpen2025_26((v) => !v)}
+              className="flex w-full items-center justify-between p-6 sm:p-8 text-left transition-colors hover:bg-surface-2"
+            >
+              <div>
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+                    Academic Year
+                  </span>
+                  <span className="rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 font-mono text-[10px] text-primary font-bold">
+                    {events2025_26.length} Events
+                  </span>
+                </div>
+                <h2 className="mt-2 font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                  Tenure 2025–2026
+                </h2>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Competitions, expert workshops, NSS social drives and technical training.
+                </p>
+              </div>
+              <span
+                className={`grid size-10 place-items-center border border-border bg-background font-mono text-lg transition-transform duration-300 ${
+                  open2025_26 ? "rotate-180" : ""
+                }`}
+              >
+                ↓
+              </span>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {open2025_26 && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="overflow-hidden border-t border-border bg-background p-6 sm:p-10"
+                >
+                  {events2025_26.length === 0 ? (
+                    <div className="py-12 text-center text-muted-foreground font-mono text-xs">
+                      No events in 2025–26 match your search criteria.
+                    </div>
+                  ) : (
+                    <div className="space-y-20">
+                      {events2025_26.map((e, i) => {
                         const flip = i % 2 === 1;
                         return (
                           <Reveal key={e.id}>
